@@ -12,9 +12,16 @@ function Cell(props){
         padding: '0',
         fontSize: '16px'
     }
+    function showContent(){
+        let content = '';
+        if(props.content.show){
+            content = props.content.value;
+        }
+        return content;
+    }
     return (
-        <div style={cellStyle}>
-            {props.content}
+        <div style={cellStyle} onClick={()=>props.onCellClick(props.content.id)}>
+            {showContent()}
         </div>
     )
 }

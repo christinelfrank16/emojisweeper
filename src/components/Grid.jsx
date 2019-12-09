@@ -9,8 +9,10 @@ function Grid(props){
         return (
             <div key={rowIndex} style={style}>
                 {rowArray.map((cellElement, cellIndex) => {
+                    const id = `${rowIndex}-${cellIndex}`;
+                    cellElement.id = id;
                     return(
-                        <Cell key={rowIndex-cellIndex} content={cellElement}/>
+                        <Cell key={rowIndex-cellIndex} content={cellElement} onCellClick={props.onCellClick}/>
                     )
                 })}
             </div>
