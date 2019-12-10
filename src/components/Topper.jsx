@@ -11,13 +11,13 @@ function Topper(props){
     width: '75%'
   };
   function gameOverValue(){
-      if(props.gameOver && props.gameWon){
-          return "Winner";
-      } else if (props.gameOver && !props.gameWon){
-          return "Loser";
-      } else {
-          return null;
-      }
+    if(props.gameOver && props.gameWon){
+      return 'Winner';
+    } else if (props.gameOver && !props.gameWon){
+      return 'Loser';
+    } else {
+      return null;
+    }
   }
   return(
     <div style={width}>

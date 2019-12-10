@@ -17,7 +17,7 @@ function Cell(props){
     if(props.content.show){
       content = props.content.value;
     } else if (props.content.flag) {
-        content = '⚠️'
+      content = '⚠️';
     }
     return content;
   }
