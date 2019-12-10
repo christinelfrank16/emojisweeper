@@ -122,7 +122,7 @@ class App extends React.Component {
                 }
             })
         });
-        this.setState({gameWon: gameWon, gameOver: true});
+        this.setState({gameWon: gameWon, gameOver: gameWon});
     }
 
     handleStartClick(){
