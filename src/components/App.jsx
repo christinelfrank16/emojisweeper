@@ -1,6 +1,7 @@
 import React from 'react';
 import Grid from './Grid';
 import Topper from './Topper';
+import SettingsForm from './SettingsForm';
 
 class App extends React.Component {
   constructor(props){
@@ -24,11 +25,11 @@ class App extends React.Component {
     this.checkGameWon = this.checkGameWon.bind(this);
   }
 
-  createGrid(){
+  createGrid(dimSize){
       let newGrid = [];
-      for(let i = 0; i < this.state.dimension; i ++){
+      for(let i = 0; i < dimSize; i ++){
           let row = [];
-        for(let j = 0; j < this.state.dimension; j ++){
+        for(let j = 0; j < dimSize; j ++){
           row.push({value: '', show: false});
         }
         newGrid.push(row);
@@ -36,12 +37,12 @@ class App extends React.Component {
       return newGrid;
   }
 
-  randomizeMines(arraySlice){
-    for(let i = 0; i<this.state.remainingMines; i++){
+  randomizeMines(arraySlice, bombCount){
+    for(let i = 0; i<bombCount; i++){
         let valueEmpty = true;
         while(valueEmpty){
-            let randomizeX = Math.floor(Math.random() * this.state.dimension);
-            let randomizeY = Math.floor(Math.random() * this.state.dimension);
+            let randomizeX = Math.floor(Math.random() * arraySlice.length);
+          let randomizeY = Math.floor(Math.random() * arraySlice.length);
             if(arraySlice[randomizeX][randomizeY].value === ''){
                 arraySlice[randomizeX][randomizeY].value = '💣';
                 valueEmpty = false;
@@ -64,7 +65,7 @@ class App extends React.Component {
   }
 
   getCellAt(x,y, array){
-      if(x >= 0 && y >= 0 && x < this.state.dimension && y < this.state.dimension){
+      if(x >= 0 && y >= 0 && x < array.length && y < array.length){
           return array[x][y];
       } else {
           return null;
@@ -125,11 +126,20 @@ class App extends React.Component {
         this.setState({gameWon: gameWon, gameOver: gameWon});
     }
 
-    handleStartClick(){
-        let newGrid = this.createGrid();
-        newGrid = this.randomizeMines(newGrid);
+    handleStartClick(event, bombCount, dimension){
+      event.preventDefault();
+      let bombs = 5;
+      let dimSize = 5;
+      if(bombCount.value !== 0 && bombCount.value !== null){
+        bombs = bombCount.value;
+      }
+      if(dimension.value !== 0 && dimension.value !== null){
+        dimSize = dimension.value;
+      }
+        let newGrid = this.createGrid(dimSize);
+        newGrid = this.randomizeMines(newGrid, bombs);
         newGrid = this.setCellValues(newGrid);
-        this.setState({array: newGrid, gameOver: false});
+        this.setState({array: newGrid, gameOver: false, dimension: dimSize, remainingMines: bombs, winner: false});
     }
 
   render(){
@@ -144,7 +154,7 @@ class App extends React.Component {
       <div style={center}>
         <Topper remainingMines={this.state.remainingMines} timer='111' gameOver={this.state.gameOver} gameWon={this.state.gameWon}/>
         <Grid onCellClick={this.handleCellClick} array={this.state.array} onContextMenu={this.handleContextMenu}/>
-        <button type='button' onClick={this.handleStartClick}>Start</button>
+        <SettingsForm onSubmit={this.handleStartClick}/>
       </div>
     );
   }
