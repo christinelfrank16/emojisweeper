@@ -23,6 +23,7 @@ class App extends React.Component {
     this.getNeighbors = this.getNeighbors.bind(this);
     this.getCellAt = this.getCellAt.bind(this);
     this.checkGameWon = this.checkGameWon.bind(this);
+    this.explody = this.explody.bind(this);
   }
 
   createGrid(dimSize){
@@ -100,47 +101,69 @@ class App extends React.Component {
   handleCellClick(event, id){
       event.preventDefault();
 
-        if (!this.state.gameOver){
-            console.log(this.state);
-            const row = Number(id.substring(0,id.indexOf('-')));
-            const col = Number(id.substring(id.indexOf('-')+1));
-            let arraySlice = this.state.array.slice();
-            arraySlice[row][col].show = true;
-            if (arraySlice[row][col].value === '💣') {
-                this.setState({gameOver: true, array: arraySlice})
-            } else {
-                this.setState({array: arraySlice}, this.checkGameWon());
+      if (!this.state.gameOver){
+          console.log(this.state);
+          const row = Number(id.substring(0,id.indexOf('-')));
+          const col = Number(id.substring(id.indexOf('-')+1));
+          let arraySlice = this.state.array.slice();
+          arraySlice[row][col].show = true;
+          if (arraySlice[row][col].value === '💣') {
+              this.setState({gameOver: true, array: arraySlice})
+          } else {
+            if(arraySlice[row][col].value === 0){
+              arraySlice = this.explody(row, col, arraySlice);
             }
-        }
-    }
-
-    checkGameWon(){
-        let gameWon = true;
-        this.state.array.forEach((row) => {
-            row.forEach((cell) => {
-                if(cell.show === false && cell.value !== '💣'){
-                    gameWon = false;
-                }
-            })
-        });
-        this.setState({gameWon: gameWon, gameOver: gameWon});
-    }
-
-    handleStartClick(event, bombCount, dimension){
-      event.preventDefault();
-      let bombs = 5;
-      let dimSize = 5;
-      if(bombCount.value !== 0 && bombCount.value !== null){
-        bombs = bombCount.value;
+              this.setState({array: arraySlice}, this.checkGameWon());
+          }
       }
-      if(dimension.value !== 0 && dimension.value !== null){
-        dimSize = dimension.value;
+  }
+
+  explody(x, y, array){
+    let checkCells = this.getNeighbors(x, y, array); // on first click;
+    console.log(checkCells);
+    while(checkCells.length !== 0){
+      if(checkCells[0].value === 0 && checkCells[0].show === false){
+        console.log(checkCells[0]);
+        const row = Number(checkCells[0].id.substring(0, checkCells[0].id.indexOf('-')));
+        const col = Number(checkCells[0].id.substring(checkCells[0].id.indexOf('-') + 1));
+        checkCells = checkCells.concat(this.getNeighbors(row, col, array));
+        checkCells[0].show = true;
+      } else if (checkCells[0].value !== '💣' && checkCells[0].show === false){
+        checkCells[0].show = true;
       }
-        let newGrid = this.createGrid(dimSize);
-        newGrid = this.randomizeMines(newGrid, bombs);
-        newGrid = this.setCellValues(newGrid);
-        this.setState({array: newGrid, gameOver: false, dimension: dimSize, remainingMines: bombs, winner: false});
+      checkCells.splice(0,1);
     }
+    return array;
+  }
+
+  checkGameWon(){
+      let gameWon = true;
+      this.state.array.forEach((row) => {
+          row.forEach((cell) => {
+              if(cell.show === false && cell.value !== '💣'){
+                  gameWon = false;
+              }
+          })
+      });
+      this.setState({gameWon: gameWon, gameOver: gameWon});
+  }
+
+  handleStartClick(event, bombCount, dimension){
+    event.preventDefault();
+    let bombs = 5;
+    let dimSize = 5;
+    console.log(bombCount.value);
+    if(bombCount.value !== 0 && bombCount.value !== ''){
+      bombs = bombCount.value;
+    }
+    if(dimension.value !== 0 && dimension.value !== ''){
+      dimSize = dimension.value;
+    }
+      let newGrid = this.createGrid(dimSize);
+      newGrid = this.randomizeMines(newGrid, bombs);
+      newGrid = this.setCellValues(newGrid);
+      this.setState({array: newGrid, gameOver: false, dimension: dimSize, remainingMines: bombs, winner: false});
+  }
 
   render(){
     var center = {
